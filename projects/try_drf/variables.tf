@@ -12,13 +12,13 @@ variable "organization_key" {
 variable "project_key" {
   type        = string
   description = "The SonarCloud project key"
-  default     = "oyurch_twitter_crawler"
+  default     = "oyurch_try_drf"
 }
 
 variable "project_name" {
   type        = string
   description = "The SonarCloud project name"
-  default     = "Twitter Crawler"
+  default     = "Try DRF"
 }
 
 variable "quality_gate_id" {
@@ -33,8 +33,8 @@ variable "group_name" {
   default     = "members"
 }
 
-variable "permission" {
-  type        = string
+variable "permissions" {
+  type        = list(string)
   description = "The permission to add to the group"
-  default     = "admin"
+  default     = ["admin", "codeviewer"]
 }

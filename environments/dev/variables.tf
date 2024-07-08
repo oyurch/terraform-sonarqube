@@ -21,8 +21,8 @@ variable "group_name" {
   default     = "members"
 }
 
-variable "permission" {
-  type        = string
+variable "permissions" {
+  type        = list(string)
   description = "The permission to add to the group"
-  default     = "admin"
+  default     = ["admin"]
 }

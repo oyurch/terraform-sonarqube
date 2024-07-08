@@ -1,37 +1,34 @@
 terraform {
   required_providers {
-    http = {
-      source  = "hashicorp/http"
-      version = "~> 2.0"
+    sonarcloud = {
+      source  = "rewe-digital/sonarcloud"
+      version = "0.1.1"
     }
   }
 }
 
-resource "null_resource" "create_project" {
-  provisioner "local-exec" {
-    command = <<EOT
-      curl -u ${var.sonarcloud_api_token}: \
-           -X POST "https://sonarcloud.io/api/projects/create?organization=${var.organization_key}&name=${var.project_name}&project=${var.project_key}"
-    EOT
-  }
+provider "sonarcloud" {
+  organization = var.organization_key
+  token        = var.sonarcloud_api_token
 }
 
-resource "null_resource" "assign_quality_gate" {
-  provisioner "local-exec" {
-    command = <<EOT
-      curl -u ${var.sonarcloud_api_token}: \
-           -X POST "https://sonarcloud.io/api/qualitygates/select?projectKey=${var.project_key}&gateId=${var.quality_gate_id}"
-    EOT
-  }
-  depends_on = [null_resource.create_project]
+resource "sonarcloud_project" "project" {
+  name         = var.project_name
+  project_key  = var.project_key
+  visibility   = "public"  # or "private" based on your requirements
 }
 
-resource "null_resource" "set_permissions" {
-  provisioner "local-exec" {
-    command = <<EOT
-      curl -u ${var.sonarcloud_api_token}: \
-           -X POST "https://sonarcloud.io/api/permissions/add_group?projectKey=${var.project_key}&groupName=${var.group_name}&permission=${var.permission}"
-    EOT
-  }
-  depends_on = [null_resource.create_project]
+resource "sonarcloud_quality_gate_project_association" "quality_gate" {
+  project_key  = var.project_key
+  quality_gate = var.quality_gate_name
+}
+
+resource "sonarcloud_project_permissions" "permissions" {
+  project      = var.project_key
+  group        = var.group_name
+  permissions  = var.permissions
+}
+
+output "project_url" {
+  value = sonarcloud_project.project.url
 }
