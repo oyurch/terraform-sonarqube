@@ -12,11 +12,13 @@ variable "organization_key" {
 variable "project_key" {
   type        = string
   description = "The SonarCloud project key"
+  default     = "oyurch_twitter_crawler"
 }
 
 variable "project_name" {
   type        = string
   description = "The SonarCloud project name"
+  default     = "Twitter Crawler"
 }
 
 variable "quality_gate_id" {
