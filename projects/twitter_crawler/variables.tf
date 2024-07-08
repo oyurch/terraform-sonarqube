@@ -34,20 +34,3 @@ variable "permission" {
   type        = string
   description = "The permission to add to the group"
 }
-variable "sources" {
-  type = string
-  description = "The source code paths to analyze"
-  default = "."
-}
-
-variable "tests" {
-  type = string
-  description = "The test paths to analyze"
-  default = "tests"
-}
-
-variable "coverage_report_paths" {
-  type = string
-  description = "The paths to the coverage reports"
-  default = "./coverage.xml"
-}
