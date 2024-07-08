@@ -4,7 +4,7 @@ module "sonarcloud_project" {
   organization_key     = var.organization_key
   project_key          = "oyurch_twitter_crawler"
   project_name         = "Twitter Crawler"
-  quality_gate_id      = var.quality_gate_id
+  quality_gate_name      = var.quality_gate_name
   group_name           = var.group_name
-  permission           = var.permission
+  permissions           = var.permissions
 }

@@ -21,10 +21,10 @@ variable "project_name" {
   default     = "Try DRF"
 }
 
-variable "quality_gate_id" {
+variable "quality_gate_name" {
   type        = string
-  description = "The SonarCloud quality gate ID"
-  default     = "9"
+  description = "The SonarCloud quality gate name"
+  default     = "Sonar way"
 }
 
 variable "group_name" {
