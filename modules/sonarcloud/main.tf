@@ -1,8 +1,13 @@
-provider "null" {}
-
-provider "http" {
-  version = "~> 2.0"
+terraform {
+  required_providers {
+    http = {
+      source  = "hashicorp/http"
+      version = "~> 2.0"
+    }
+  }
 }
+
+provider "http" {}
 
 resource "null_resource" "create_project" {
   provisioner "local-exec" {
