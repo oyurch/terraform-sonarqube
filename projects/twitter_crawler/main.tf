@@ -7,7 +7,4 @@ module "sonarcloud_project" {
   quality_gate_id      = var.quality_gate_id
   group_name           = var.group_name
   permission           = var.permission
-  sources              = var.sources
-  tests                = var.tests
-  coverage_report_paths = var.coverage_report_paths
 }

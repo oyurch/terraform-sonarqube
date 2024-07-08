@@ -7,14 +7,21 @@ terraform {
   }
 }
 
-resource "null_resource" "create_or_update_project" {
+resource "null_resource" "create_project" {
   provisioner "local-exec" {
     command = <<EOT
       curl -u ${var.sonarcloud_api_token}: \
            -X POST "https://sonarcloud.io/api/projects/create" \
            -d "organization=${var.organization_key}" \
            -d "name=${var.project_name}" \
-           -d "project=${var.project_key}" || \
+           -d "project=${var.project_key}"
+    EOT
+  }
+}
+
+resource "null_resource" "update_project" {
+  provisioner "local-exec" {
+    command = <<EOT
       curl -u ${var.sonarcloud_api_token}: \
            -X POST "https://sonarcloud.io/api/projects/update" \
            -d "organization=${var.organization_key}" \
@@ -22,6 +29,7 @@ resource "null_resource" "create_or_update_project" {
            -d "project=${var.project_key}"
     EOT
   }
+  depends_on = [null_resource.create_project]
 }
 
 resource "null_resource" "assign_quality_gate" {
@@ -33,7 +41,7 @@ resource "null_resource" "assign_quality_gate" {
            -d "gateId=${var.quality_gate_id}"
     EOT
   }
-  depends_on = [null_resource.create_or_update_project]
+  depends_on = [null_resource.update_project]
 }
 
 resource "null_resource" "set_permissions" {
@@ -46,21 +54,7 @@ resource "null_resource" "set_permissions" {
            -d "permission=${var.permission}"
     EOT
   }
-  depends_on = [null_resource.create_or_update_project]
-}
-
-resource "null_resource" "run_sonarscanner" {
-  provisioner "local-exec" {
-    command = <<EOT
-      sonar-scanner \
-      -Dsonar.projectKey=${var.project_key} \
-      -Dsonar.organization=${var.organization_key} \
-      -Dsonar.sources=${var.sources} \
-      -Dsonar.tests=${var.tests} \
-      -Dsonar.python.coverage.reportPaths=${var.coverage_report_paths} \
-      -Dsonar.login=${var.sonarcloud_api_token}
-    EOT
-  }
+  depends_on = [null_resource.update_project]
 }
 
 output "project_url" {

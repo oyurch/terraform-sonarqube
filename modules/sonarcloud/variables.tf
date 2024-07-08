@@ -25,15 +25,3 @@ variable "group_name" {
 variable "permission" {
   type = string
 }
-
-variable "sources" {
-  type = string
-}
-
-variable "tests" {
-  type = string
-}
-
-variable "coverage_report_paths" {
-  type = string
-}
