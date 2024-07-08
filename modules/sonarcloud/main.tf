@@ -7,8 +7,6 @@ terraform {
   }
 }
 
-provider "http" {}
-
 resource "null_resource" "create_project" {
   provisioner "local-exec" {
     command = <<EOT
