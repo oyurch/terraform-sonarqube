@@ -84,8 +84,8 @@ resource "sonarcloud_quality_gate" "backend-python-standard" {
   ]
 }
 
-data "sonarcloud_quality_gate" "try_drf" {
-  name = "backend-python-standard"
+data "sonarcloud_quality_gate" "backend-python-standard" {
+  name = "BE Python Standard"
 }
 
 data "sonarcloud_projects" "all" {}
