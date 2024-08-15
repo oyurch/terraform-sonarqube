@@ -24,7 +24,7 @@ resource "sonarcloud_project_main_branch" "main" {
 }
 
 resource "sonarcloud_quality_gate" "backend-python-standard" {
-  name       = "BE Python Standard"
+  name       = "backend-python-standard"
   is_default = false
   conditions = [
     // Less than 100% coverage on new code
@@ -85,7 +85,7 @@ resource "sonarcloud_quality_gate" "backend-python-standard" {
 }
 
 data "sonarcloud_quality_gate" "try_drf" {
-  name = "BE Python Standard"
+  name = "backend-python-standard"
 }
 
 data "sonarcloud_projects" "all" {}
