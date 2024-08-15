@@ -21,7 +21,7 @@ resource "null_resource" "create_quality_gate" {
         curl -X POST \
         -u ${var.sonarcloud_api_token}: \
         "https://sonarcloud.io/api/qualitygates/create_condition" \
-        -d "organization=${var.sonarcloud_organization}&gateName=${each.value.name}&metric=$metric&operator=$operator&error=$error"
+        -d "organization=${var.sonarcloud_organization}&gateName=${each.value.name}&metric=$metric&op=$operator&error=$error"
       done
     EOT
   }
