@@ -6,7 +6,7 @@ resource "null_resource" "manage_project" {
     sonarcloud_organization = var.sonarcloud_organization
     project_key            = each.value.key
     project_name           = each.value.name
-    quality_gate_name      = each.value.quality_gate
+    quality_gate_name      = var.quality_gates[each.value.quality_gate].name
   }
 
   provisioner "local-exec" {

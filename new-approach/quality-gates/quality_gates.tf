@@ -4,7 +4,7 @@ resource "null_resource" "manage_quality_gate" {
   triggers = {
     sonarcloud_token       = var.sonarcloud_api_token
     sonarcloud_organization = var.sonarcloud_organization
-    gate_name              = each.value.name
+    gate_name               = var.quality_gates[each.value.name].name
     gate_id                = ""  # This is a placeholder for the gate ID
   }
 
