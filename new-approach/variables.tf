@@ -1,4 +1,4 @@
-variable "sonarcloud_token" {
+variable "sonarcloud_api_token" {
   type        = string
   description = "The SonarCloud API token"
 }

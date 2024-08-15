@@ -11,7 +11,7 @@ resource "null_resource" "create_quality_gate" {
   }
 
   provisioner "local-exec" {
-    when    = "create"
+    when    = create
     command = <<EOT
       for condition in ${join(" ", each.value.conditions)}; do
         curl -X POST \
