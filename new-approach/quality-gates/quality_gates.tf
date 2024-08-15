@@ -5,12 +5,13 @@ resource "null_resource" "manage_quality_gate" {
     sonarcloud_token       = var.sonarcloud_api_token
     sonarcloud_organization = var.sonarcloud_organization
     gate_name              = each.value.name
+    gate_id                = chomp(shell("${path.module}/scripts/get_gate_id.sh", var.sonarcloud_api_token, var.sonarcloud_organization, each.value.name))
   }
 
   provisioner "local-exec" {
     when = create
     command = <<EOT
-      gate_id=$(curl -s -u ${self.triggers.sonarcloud_token}: "https://sonarcloud.io/api/qualitygates/create" -d "organization=${self.triggers.sonarcloud_organization}&name=${self.triggers.gate_name}" | jq -r '.id')
+      gate_id=${self.triggers.gate_id}
 
       if [ -z "$gate_id" ]; then
         echo "Error: Quality gate creation failed"
@@ -33,7 +34,7 @@ resource "null_resource" "manage_quality_gate" {
   provisioner "local-exec" {
     when = destroy
     command = <<EOT
-      gate_id=$(curl -s -u ${self.triggers.sonarcloud_token}: "https://sonarcloud.io/api/qualitygates/show" -d "organization=${self.triggers.sonarcloud_organization}" | jq -r '.qualitygates[] | select(.name=="${self.triggers.gate_name}") | .id')
+      gate_id=${self.triggers.gate_id}
 
       if [ -n "$gate_id" ]; then
         curl -X POST \
