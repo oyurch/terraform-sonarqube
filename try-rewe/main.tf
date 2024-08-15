@@ -91,6 +91,6 @@ data "sonarcloud_quality_gate" "backend-python-standard" {
 data "sonarcloud_projects" "all" {}
 
 resource "sonarcloud_quality_gate_selection" "quality_gate_try_drf" {
-  gate_id      = data.sonarcloud_quality_gate.try_drf.gate_id
+  gate_id      = data.sonarcloud_quality_gate.backend-python-standard.gate_id
   project_keys = [for project in data.sonarcloud_projects.all.projects : project.key if project.name == "Try DRF"]
 }
