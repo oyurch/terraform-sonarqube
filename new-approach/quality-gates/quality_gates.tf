@@ -43,7 +43,7 @@ resource "null_resource" "delete_quality_gate" {
   for_each = var.quality_gates
 
   provisioner "local-exec" {
-    when = "destroy"
+    when = destroy
     command = <<EOT
       gate_id=$(curl -s -u ${self.triggers.sonarcloud_token}: "https://sonarcloud.io/api/qualitygates/show" -d "organization=${self.triggers.sonarcloud_organization}" | jq -r '.qualitygates[] | select(.name=="${self.triggers.gate_name}") | .id')
 

@@ -11,23 +11,29 @@ resource "null_resource" "create_project" {
   }
 }
 
+resource "null_resource" "project_data" {
+  for_each = var.projects
+
+  triggers = {
+    sonarcloud_token       = var.sonarcloud_api_token
+    sonarcloud_organization = var.sonarcloud_organization
+    project_key            = each.value.key
+  }
+}
+
 resource "null_resource" "delete_project" {
   for_each = var.projects
 
   provisioner "local-exec" {
     when = destroy
-    environment = {
-      SONARCLOUD_TOKEN        = var.sonarcloud_api_token
-      SONARCLOUD_ORGANIZATION = var.sonarcloud_organization
-      PROJECT_KEY             = each.value.key
-    }
     command = <<EOT
       curl -X POST \
-      -u $SONARCLOUD_TOKEN: \
+      -u ${self.triggers.sonarcloud_token}: \
       "https://sonarcloud.io/api/projects/delete" \
-      -d "organization=$SONARCLOUD_ORGANIZATION&project=$PROJECT_KEY"
+      -d "organization=${self.triggers.sonarcloud_organization}&project=${self.triggers.project_key}"
     EOT
   }
+  depends_on = [null_resource.project_data]
 }
 
 resource "null_resource" "assign_quality_gate" {
