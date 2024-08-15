@@ -34,15 +34,6 @@ resource "null_resource" "delete_quality_gate" {
 
   provisioner "local-exec" {
     when = destroy
-    command = <<EOT
-      gate_id=$(curl -s -u ${var.sonarcloud_api_token}: "https://sonarcloud.io/api/qualitygates/show" -d "organization=${var.sonarcloud_organization}" | jq -r '.qualitygates[] | select(.name=="${each.value.name}") | .id')
-
-      if [ -n "$gate_id" ]; then
-        curl -X POST \
-        -u ${var.sonarcloud_api_token}: \
-        "https://sonarcloud.io/api/qualitygates/delete" \
-        -d "id=$gate_id"
-      fi
-    EOT
+    command = "${path.module}/delete_quality_gate.sh ${var.sonarcloud_api_token} ${var.sonarcloud_organization} ${each.value.name}"
   }
 }

@@ -15,7 +15,7 @@ resource "null_resource" "delete_project" {
   for_each = var.projects
 
   provisioner "local-exec" {
-    when = "destroy"
+    when = destroy
     environment = {
       SONARCLOUD_TOKEN        = var.sonarcloud_api_token
       SONARCLOUD_ORGANIZATION = var.sonarcloud_organization
