@@ -5,6 +5,7 @@ resource "null_resource" "manage_quality_gate" {
     sonarcloud_token       = var.sonarcloud_api_token
     sonarcloud_organization = var.sonarcloud_organization
     gate_name              = each.value.name
+    gate_id                = ""  # This is a placeholder for the gate ID
   }
 
   provisioner "local-exec" {
@@ -34,12 +35,12 @@ resource "null_resource" "manage_quality_gate" {
     when = destroy
     command = <<EOT
       gate_id=$(curl -s -u ${self.triggers.sonarcloud_token}: "https://sonarcloud.io/api/qualitygates/show" -d "organization=${self.triggers.sonarcloud_organization}" | jq -r '.qualitygates[] | select(.name=="${self.triggers.gate_name}") | .id')
-
+      self.triggers.gate_id = gate_id
       if [ -n "$gate_id" ]; then
         curl -X POST \
         -u ${self.triggers.sonarcloud_token}: \
         "https://sonarcloud.io/api/qualitygates/destroy" \
-        -d "id=${gate_id}&organization=${self.triggers.sonarcloud_organization}"
+        -d "id=${self.triggers.gate_id}&organization=${self.triggers.sonarcloud_organization}"
       fi
     EOT
   }
