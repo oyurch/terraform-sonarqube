@@ -6,6 +6,7 @@ resource "null_resource" "manage_project" {
     sonarcloud_organization = var.sonarcloud_organization
     project_key            = each.value.key
     project_name           = each.value.name
+    quality_gate_name      = each.value.quality_gate
   }
 
   provisioner "local-exec" {
@@ -15,6 +16,13 @@ resource "null_resource" "manage_project" {
       -u ${self.triggers.sonarcloud_token}: \
       "https://sonarcloud.io/api/projects/create" \
       -d "organization=${self.triggers.sonarcloud_organization}&project=${self.triggers.project_key}&name=${self.triggers.project_name}"
+
+      gate_id=$(curl -s -u ${self.triggers.sonarcloud_token}: "https://sonarcloud.io/api/qualitygates/show" -d "organization=${self.triggers.sonarcloud_organization}" | jq -r '.qualitygates[] | select(.name=="${self.triggers.quality_gate_name}") | .id')
+
+      curl -X POST \
+      -u ${self.triggers.sonarcloud_token}: \
+      "https://sonarcloud.io/api/qualitygates/select" \
+      -d "organization=${self.triggers.sonarcloud_organization}&projectKey=${self.triggers.project_key}&gateId=$gate_id"
     EOT
   }
 
