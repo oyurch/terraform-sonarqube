@@ -39,7 +39,7 @@ resource "null_resource" "manage_quality_gate" {
         curl -X POST \
         -u ${self.triggers.sonarcloud_token}: \
         "https://sonarcloud.io/api/qualitygates/destroy" \
-        -d "id=$gate_id"
+        -d "id=$gate_id&organization=${self.triggers.sonarcloud_organization}"
       fi
     EOT
   }
