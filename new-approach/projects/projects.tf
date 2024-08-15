@@ -9,6 +9,16 @@ resource "null_resource" "create_project" {
       -d "organization=${var.sonarcloud_organization}&project=${each.value.key}&name=${each.value.name}"
     EOT
   }
+
+  provisioner "local-exec" {
+    when = destroy
+    command = <<EOT
+      curl -X POST \
+      -u ${var.sonarcloud_api_token}: \
+      "https://sonarcloud.io/api/projects/delete" \
+      -d "organization=${var.sonarcloud_organization}&project=${each.value.key}"
+    EOT
+  }
 }
 
 resource "null_resource" "assign_quality_gate" {

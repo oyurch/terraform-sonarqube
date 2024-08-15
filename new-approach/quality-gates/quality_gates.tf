@@ -25,4 +25,15 @@ resource "null_resource" "create_quality_gate" {
       done
     EOT
   }
+  provisioner "local-exec" {
+    when = destroy
+    command = <<EOT
+      gate_id=$(curl -s -u ${var.sonarcloud_api_token}: "https://sonarcloud.io/api/qualitygates/show" -d "organization=${var.sonarcloud_organization}" | jq -r '.qualitygates[] | select(.name=="${each.value.name}") | .id')
+
+      curl -X POST \
+      -u ${var.sonarcloud_api_token}: \
+      "https://sonarcloud.io/api/qualitygates/delete" \
+      -d "id=$gate_id"
+    EOT
+  }
 }
