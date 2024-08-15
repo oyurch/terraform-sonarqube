@@ -39,6 +39,11 @@ resource "sonarcloud_quality_gate" "backend-python-standard" {
       op     = "LT"
     },
     {
+      metric = "new_conditions_to_cover"
+      error  = 10
+      op     = "LT"
+    },
+    {
       metric = "new_duplicated_lines_density"
       error  = 100
       op     = "LT"
@@ -80,7 +85,7 @@ resource "sonarcloud_quality_gate" "backend-python-standard" {
 }
 
 data "sonarcloud_quality_gate" "try_drf" {
-  name = "BE Python Standard"
+  name = "backend-python-standard"
 }
 
 data "sonarcloud_projects" "all" {}
