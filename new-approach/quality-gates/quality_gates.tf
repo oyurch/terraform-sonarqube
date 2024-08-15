@@ -34,13 +34,11 @@ resource "null_resource" "manage_quality_gate" {
   provisioner "local-exec" {
     when = destroy
     command = <<EOT
-      gate_id=${self.triggers.gate_id}
-
-      if [ -n "$gate_id" ]; then
+      if [ -n "${self.triggers.gate_id}" ]; then
         curl -X POST \
         -u ${self.triggers.sonarcloud_token}: \
         "https://sonarcloud.io/api/qualitygates/destroy" \
-        -d "id=${gate_id}&organization=${self.triggers.sonarcloud_organization}"
+        -d "id=${self.triggers.gate_id}&organization=${self.triggers.sonarcloud_organization}"
       fi
     EOT
   }
