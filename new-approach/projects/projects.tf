@@ -9,14 +9,23 @@ resource "null_resource" "create_project" {
       -d "organization=${var.sonarcloud_organization}&project=${each.value.key}&name=${each.value.name}"
     EOT
   }
+}
+
+resource "null_resource" "delete_project" {
+  for_each = var.projects
 
   provisioner "local-exec" {
-    when = destroy
+    when = "destroy"
+    environment = {
+      SONARCLOUD_TOKEN        = var.sonarcloud_api_token
+      SONARCLOUD_ORGANIZATION = var.sonarcloud_organization
+      PROJECT_KEY             = each.value.key
+    }
     command = <<EOT
       curl -X POST \
-      -u ${var.sonarcloud_api_token}: \
+      -u $SONARCLOUD_TOKEN: \
       "https://sonarcloud.io/api/projects/delete" \
-      -d "organization=${var.sonarcloud_organization}&project=${each.value.key}"
+      -d "organization=$SONARCLOUD_ORGANIZATION&project=$PROJECT_KEY"
     EOT
   }
 }
