@@ -11,8 +11,10 @@ resource "null_resource" "create_quality_gate" {
   }
 
   provisioner "local-exec" {
-    when    = create
+    when = create
     command = <<EOT
+      gate_id=$(curl -s -u ${var.sonarcloud_api_token}: "https://sonarcloud.io/api/qualitygates/show" -d "organization=${var.sonarcloud_organization}" | jq -r '.qualitygates[] | select(.name=="${each.value.name}") | .id')
+
       for condition in ${jsonencode(each.value.conditions)}; do
         metric=$(echo $condition | jq -r '.metric')
         operator=$(echo $condition | jq -r '.operator')
@@ -21,10 +23,11 @@ resource "null_resource" "create_quality_gate" {
         curl -X POST \
         -u ${var.sonarcloud_api_token}: \
         "https://sonarcloud.io/api/qualitygates/create_condition" \
-        -d "organization=${var.sonarcloud_organization}&gateName=${each.value.name}&metric=$metric&op=$operator&error=$error"
+        -d "organization=${var.sonarcloud_organization}&gateId=$gate_id&metric=$metric&op=$operator&error=$error"
       done
     EOT
   }
+
   provisioner "local-exec" {
     when = destroy
     command = <<EOT
