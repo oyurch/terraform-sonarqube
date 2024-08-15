@@ -23,8 +23,8 @@ resource "sonarcloud_project_main_branch" "main" {
   name        = "master"
 }
 
-resource "sonarcloud_quality_gate" "backend-python-standard" {
-  name       = "backend-python-standard"
+resource "sonarcloud_quality_gate" "be-python-standard" {
+  name       = "be-python-standard"
   is_default = false
   conditions = [
     // Less than 100% coverage on new code
