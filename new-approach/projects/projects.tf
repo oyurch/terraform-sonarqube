@@ -40,5 +40,5 @@ resource "null_resource" "assign_quality_gate" {
       -d "organization=${var.sonarcloud_organization}&projectKey=${each.value.key}&gateName=${var.quality_gates[each.value.quality_gate].name}"
     EOT
   }
-  depends_on = [null_resource.create_project]
+  depends_on = [null_resource.manage_project]
 }
