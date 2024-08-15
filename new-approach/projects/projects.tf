@@ -19,6 +19,11 @@ resource "null_resource" "manage_project" {
 
       gate_id=$(curl -s -u ${self.triggers.sonarcloud_token}: "https://sonarcloud.io/api/qualitygates/show" -d "organization=${self.triggers.sonarcloud_organization}" | jq -r '.qualitygates[] | select(.name=="${self.triggers.quality_gate_name}") | .id')
 
+      if [ -z "$gate_id" ]; then
+        echo "Error: Quality gate ID not found"
+        exit 1
+      fi
+
       curl -X POST \
       -u ${self.triggers.sonarcloud_token}: \
       "https://sonarcloud.io/api/qualitygates/select" \
