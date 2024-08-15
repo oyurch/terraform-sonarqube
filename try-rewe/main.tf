@@ -27,34 +27,26 @@ resource "sonarcloud_quality_gate" "backend-python-standard" {
   name       = "BE Python Standard"
   is_default = true
   conditions = [
-    // Less than 100% coverage
-    {
-      metric = "coverage"
-      error  = 100
-      op     = "LT"
-    },
     // Less than 100% coverage on new code
     {
       metric = "new_coverage"
       error  = 100
       op     = "LT"
     },
-    // More than 0.1% duplicated lines
     {
-      metric = "duplicated_lines_density"
-      error  = 0.1
-      op     = "GT"
+      metric = "new_line_coverage"
+      error  = 100
+      op     = "LT"
+    },
+    {
+      metric = "new_duplicated_lines_density"
+      error  = 100
+      op     = "LT"
     },
     // More than 0.1% duplicated lines on new code
     {
       metric = "new_duplicated_lines_density"
       error  = 0.1
-      op     = "GT"
-    },
-    // More than 0 security rating
-    {
-      metric = "security_rating"
-      error  = 0
       op     = "GT"
     },
     // More than 0 security rating on new code
@@ -63,16 +55,25 @@ resource "sonarcloud_quality_gate" "backend-python-standard" {
       error  = 0
       op     = "GT"
     },
-    // More than 0 maintainability rating
-    {
-      metric = "maintainability_rating"
-      error  = 0
-      op     = "GT"
-    },
     // More than 0 maintainability rating on new code
     {
       metric = "new_maintainability_rating"
       error  = 0
+      op     = "GT"
+    },
+    {
+      metric = "new_code_smells"
+      error  = 0
+      op     = "GT"
+    },
+    {
+      metric = "new_critical_violations"
+      error  = 0
+      op     = "GT"
+    },
+    {
+      metric = "new_lines_to_cover"
+      error  = 700
       op     = "GT"
     },
   ]
