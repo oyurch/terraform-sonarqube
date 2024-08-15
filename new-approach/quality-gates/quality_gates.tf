@@ -19,14 +19,14 @@ resource "null_resource" "manage_quality_gate" {
       fi
 
       for condition in $(echo '${jsonencode(each.value.conditions)}' | jq -c '.[]'); do
-          metric=$(echo \$condition | jq -r '.metric')
-          operator=$(echo \$condition | jq -r '.operator')
-          error=$(echo \$condition | jq -r '.error')
+          metric=$(echo $condition | jq -r '.metric')
+          operator=$(echo $condition | jq -r '.operator')
+          error=$(echo $condition | jq -r '.error')
 
           curl -X POST \
             -u ${self.triggers.sonarcloud_token}: \
             "https://sonarcloud.io/api/qualitygates/create_condition" \
-            -d "gateId=\"$gate_id\"&metric=\"$metric\"&op=\"$operator\"&error=\"$error\""
+            -d "gateId=$gate_id&metric=$metric&op=$operator&error=$error"
       done
     EOT
   }

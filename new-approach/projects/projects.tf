@@ -27,7 +27,7 @@ resource "null_resource" "manage_project" {
       curl -X POST \
       -u ${self.triggers.sonarcloud_token}: \
       "https://sonarcloud.io/api/qualitygates/select" \
-      -d "organization=${self.triggers.sonarcloud_organization}&projectKey=${self.triggers.project_key}&gateId=\"$gate_id\""
+      -d "organization=${self.triggers.sonarcloud_organization}&projectKey=${self.triggers.project_key}&gateId=$gate_id"
     EOT
   }
 
