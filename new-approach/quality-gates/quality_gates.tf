@@ -28,12 +28,25 @@ resource "null_resource" "create_quality_gate" {
     EOT
   }
 }
-
 resource "null_resource" "delete_quality_gate" {
   for_each = var.quality_gates
 
   provisioner "local-exec" {
-    when = destroy
-    command = "${path.module}/delete_quality_gate.sh ${var.sonarcloud_api_token} ${var.sonarcloud_organization} ${each.value.name}"
+    when = "destroy"
+    environment = {
+      SONARCLOUD_API_TOKEN  = var.sonarcloud_api_token
+      SONARCLOUD_ORGANIZATION = var.sonarcloud_organization
+      GATE_NAME = each.value.name
+    }
+    command = <<EOT
+      gate_id=$(curl -s -u $SONARCLOUD_API_TOKEN: "https://sonarcloud.io/api/qualitygates/show" -d "organization=$SONARCLOUD_ORGANIZATION" | jq -r '.qualitygates[] | select(.name=="$GATE_NAME") | .id')
+
+      if [ -n "$gate_id" ]; then
+        curl -X POST \
+        -u $SONARCLOUD_API_TOKEN: \
+        "https://sonarcloud.io/api/qualitygates/delete" \
+        -d "id=$gate_id"
+      fi
+    EOT
   }
 }
