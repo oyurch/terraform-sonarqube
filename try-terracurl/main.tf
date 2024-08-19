@@ -15,7 +15,7 @@ resource "terracurl_http" "create_quality_gate" {
   url = "https://sonarcloud.io/api/qualitygates/create"
   method = "POST"
   headers = {
-    Authorization = "Basic ${base64encode(var.sonarcloud_token)}"
+    Authorization = "Basic ${base64encode(var.sonarcloud_api_token)}"
   }
   body = jsonencode({
     organization = var.sonarcloud_organization
