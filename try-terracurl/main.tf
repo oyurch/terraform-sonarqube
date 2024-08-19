@@ -25,6 +25,8 @@ resource "terracurl_http" "create_quality_gate" {
   response_code = 200
 }
 
+// trigger build
+
 resource "terracurl_http" "get_quality_gate_id" {
   for_each = var.quality_gates
 
