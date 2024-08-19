@@ -9,7 +9,7 @@ terraform {
 
 provider "terracurl" {}
 
-resource "terracurl_http" "create_quality_gate" {
+resource "terracurl_request" "create_quality_gate" {
   for_each = var.quality_gates
 
   url = "https://sonarcloud.io/api/qualitygates/create"
@@ -23,17 +23,19 @@ resource "terracurl_http" "create_quality_gate" {
   })
 
   response_code = 200
+  name          = ""
+  response_codes = []
 }
 
 // trigger build
 
-resource "terracurl_http" "get_quality_gate_id" {
+resource "terracurl_request" "get_quality_gate_id" {
   for_each = var.quality_gates
 
   url = "https://sonarcloud.io/api/qualitygates/show"
   method = "POST"
   headers = {
-    Authorization = "Basic ${base64encode(var.sonarcloud_token)}"
+    Authorization = "Basic ${base64encode(var.sonarcloud_api_token)}"
   }
   body = jsonencode({
     organization = var.sonarcloud_organization
@@ -46,10 +48,12 @@ resource "terracurl_http" "get_quality_gate_id" {
     gate_id = ".qualitygates[] | select(.name==\"${each.value.name}\") | .id"
   }
 
-  depends_on = [terracurl_http.create_quality_gate]
+  depends_on = [terracurl_request.create_quality_gate]
+  name = ""
+  response_codes = []
 }
 
-resource "terracurl_http" "add_quality_gate_conditions" {
+resource "terracurl_request" "add_quality_gate_conditions" {
   for_each = var.quality_gates
 
 #   count_ = length(each.value.conditions)
@@ -57,10 +61,10 @@ resource "terracurl_http" "add_quality_gate_conditions" {
   url = "https://sonarcloud.io/api/qualitygates/create_condition"
   method = "POST"
   headers = {
-    Authorization = "Basic ${base64encode(var.sonarcloud_token)}"
+    Authorization = "Basic ${base64encode(var.sonarcloud_api_token)}"
   }
   body = jsonencode({
-    gateId   = terracurl_http.get_quality_gate_id[each.key].response_data.gate_id
+    gateId   = jsonencode(terracurl_request.get_quality_gate_id[each.key].request_body).gate_id
     metric   = each.value.conditions[count.index].metric
     op       = each.value.conditions[count.index].operator
     error    = each.value.conditions[count.index].error
@@ -68,5 +72,7 @@ resource "terracurl_http" "add_quality_gate_conditions" {
 
   response_code = 200
 
-  depends_on = [terracurl_http.get_quality_gate_id]
+  depends_on = [terracurl_request.get_quality_gate_id]
+  name = ""
+  response_codes = []
 }
