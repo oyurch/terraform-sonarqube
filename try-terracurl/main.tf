@@ -23,21 +23,40 @@ resource "terracurl_request" "create_quality_gate" {
   }
 }
 
+resource "terracurl_request" "delete_quality_gate" {
+  for_each = toset(var.quality_gates)
 
-# Retrieve quality gates for each project
+  name           = "DeleteQualityGate-${each.key}"
+  method         = "POST"
+  url            = "https://sonarcloud.io/api/qualitygates/list?organization=${var.sonarcloud_organization}"
+  response_codes = ["200"]
+
+  headers = {
+    Authorization = "Basic ${base64encode("${var.sonarcloud_api_token}:")}"
+  }
+  destroy_method = "POST"
+  destroy_url = "https://sonarcloud.io/api/qualitygates/destroy?organization=${var.sonarcloud_organization}&id=${lookup(jsondecode(data.terracurl_request.get_quality_gate[each.key].response), "id", "")}"
+  destroy_headers = {
+    Authorization = "Basic ${base64encode("${var.sonarcloud_api_token}:")}"
+  }
+  destroy_response_codes = ["204"]
+
+  depends_on = [terracurl_request.create_quality_gate]
+}
+
 data "terracurl_request" "get_quality_gate" {
   for_each = toset(var.quality_gates)
 
   name           = "GetQualityGate-${each.key}"
   method         = "GET"
-  url            = "https://sonarcloud.io/api/qualitygates/show?organization=${var.sonarcloud_organization}&name=${urlencode(each.value)}"
+  url            = "https://sonarcloud.io/api/qualitygates/show?organization=${var.sonarcloud_organization}&name=${urlencode(each.key)}"
   response_codes = ["200"]
 
   headers = {
     Authorization = "Basic ${base64encode("${var.sonarcloud_api_token}:")}"
   }
 
-  depends_on = [terracurl_request.create_quality_gate]
+    depends_on = [terracurl_request.create_quality_gate]
 }
 
 # Set up conditions for each quality gate
@@ -57,10 +76,8 @@ resource "terracurl_request" "create_condition" {
 
   name           = "CreateCondition-${each.key}"
   method         = "POST"
-  url            = "https://sonarcloud.io/api/qualitygates/create_condition?organization=${var.sonarcloud_organization}&gateId=${jsondecode(data.terracurl_request.get_quality_gate[each.value.gate_name].response).id}&metric=${each.value.metric}&op=${each.value.operator}&error=${each.value.error}"
+  url            = "https://sonarcloud.io/api/qualitygates/create_condition?organization=${var.sonarcloud_organization}&gateId=${lookup(jsondecode(data.terracurl_request.get_quality_gate[each.value.gate_name].response), "id", 9)}&metric=${each.value.metric}&op=${each.value.operator}&error=${each.value.error}"
   response_codes = ["200"]
-
-
 
   depends_on = [terracurl_request.create_quality_gate]
 }
@@ -99,12 +116,12 @@ resource "terracurl_request" "assign_quality_gate" {
 
   name           = "AssignQualityGate-${each.key}"
   method         = "POST"
-  url            = "https://sonarcloud.io/api/qualitygates/select?organization=${var.sonarcloud_organization}&projectKey=${each.value.project}&gateId=${jsondecode(data.terracurl_request.get_quality_gate[each.value.quality_gate_name].response).id}"
-  response_codes = ["204"]
+  url            = "https://sonarcloud.io/api/qualitygates/select?organization=${var.sonarcloud_organization}&projectKey=${each.value.project}&gateId=${lookup(jsondecode(data.terracurl_request.get_quality_gate[each.value.quality_gate_name].response), "id", 9)}"
+  response_codes = ["204", "200"]
 
   headers = {
     Authorization = "Basic ${base64encode("${var.sonarcloud_api_token}:")}"
   }
 
-  depends_on = [terracurl_request.create_project, terracurl_request.create_quality_gate]
+  depends_on = [terracurl_request.create_quality_gate, terracurl_request.create_project]
 }
